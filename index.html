@@ -1,607 +1,899 @@
-<!DOCTYPE html>  <html lang="ar" dir="rtl">  
-<head>  
-<meta charset="UTF-8">  
-<meta name="viewport" content="width=device-width, initial-scale=1.0">  <title>Football Taktik AI</title>  <style>  
-*{  
-    box-sizing:border-box;  
-    margin:0;  
-    padding:0;  
-}  
-  
-body{  
-    font-family:Arial,Tahoma,sans-serif;  
-    background:#07111f;  
-    color:#fff;  
-    min-height:100vh;  
-}  
-  
-header{  
-    background:linear-gradient(135deg,#0b1d33,#102b4b);  
-    padding:20px;  
-    text-align:center;  
-    border-bottom:1px solid #24425f;  
-}  
-  
-.logo{  
-    font-size:28px;  
-    font-weight:bold;  
-    color:#42e695;  
-}  
-  
-.logo span{  
-    color:#ffffff;  
-}  
-  
-.subtitle{  
-    margin-top:8px;  
-    color:#a9bdd0;  
-    font-size:14px;  
-}  
-  
-.container{  
-    width:92%;  
-    max-width:1100px;  
-    margin:25px auto;  
-}  
-  
-.card{  
-    background:#0d1c2d;  
-    border:1px solid #203951;  
-    border-radius:18px;  
-    padding:20px;  
-    margin-bottom:20px;  
-    box-shadow:0 8px 25px rgba(0,0,0,.2);  
-}  
-  
-.card h2{  
-    margin-bottom:15px;  
-    font-size:20px;  
-}  
-  
-.upload{  
-    border:2px dashed #31536f;  
-    border-radius:15px;  
-    padding:35px 20px;  
-    text-align:center;  
-    cursor:pointer;  
-    transition:.3s;  
-}  
-  
-.upload:hover{  
-    border-color:#42e695;  
-    background:#10263a;  
-}  
-  
-.upload-icon{  
-    font-size:50px;  
-    margin-bottom:10px;  
-}  
-  
-#imageInput{  
-    display:none;  
-}  
-  
-#preview{  
-    max-width:100%;  
-    max-height:450px;  
-    margin:20px auto 0;  
-    display:none;  
-    border-radius:12px;  
-    border:1px solid #31536f;  
-}  
-  
-.grid{  
-    display:grid;  
-    grid-template-columns:repeat(2,1fr);  
-    gap:15px;  
-}  
-  
-label{  
-    display:block;  
-    margin-bottom:7px;  
-    color:#b9ccdc;  
-}  
-  
-select,input{  
-    width:100%;  
-    padding:13px;  
-    border-radius:10px;  
-    border:1px solid #31536f;  
-    background:#081522;  
-    color:white;  
-    font-size:15px;  
-    outline:none;  
-}  
-  
-select:focus,input:focus{  
-    border-color:#42e695;  
-}  
-  
-button{  
-    width:100%;  
-    border:0;  
-    padding:15px;  
-    border-radius:12px;  
-    font-size:17px;  
-    font-weight:bold;  
-    cursor:pointer;  
-    transition:.2s;  
-}  
-  
-.analyze{  
-    background:linear-gradient(135deg,#42e695,#19b96b);  
-    color:#06140d;  
-}  
-  
-.analyze:hover{  
-    transform:translateY(-2px);  
-    filter:brightness(1.08);  
-}  
-  
-.secondary{  
-    background:#173149;  
-    color:white;  
-    margin-top:10px;  
-}  
-  
-.result{  
-    display:none;  
-}  
-  
-.result-header{  
-    display:flex;  
-    justify-content:space-between;  
-    align-items:center;  
-    gap:10px;  
-    margin-bottom:20px;  
-}  
-  
-.badge{  
-    background:#173f36;  
-    color:#42e695;  
-    padding:7px 12px;  
-    border-radius:20px;  
-    font-size:13px;  
-}  
-  
-.analysis-grid{  
-    display:grid;  
-    grid-template-columns:repeat(2,1fr);  
-    gap:15px;  
-}  
-  
-.analysis-box{  
-    background:#081522;  
-    border:1px solid #213c55;  
-    border-radius:14px;  
-    padding:18px;  
-}  
-  
-.analysis-box h3{  
-    margin-bottom:10px;  
-    color:#42e695;  
-}  
-  
-.analysis-box p{  
-    color:#c4d2df;  
-    line-height:1.8;  
-}  
-  
-.score{  
-    font-size:35px;  
-    font-weight:bold;  
-    color:#42e695;  
-}  
-  
-.progress{  
-    width:100%;  
-    height:8px;  
-    background:#1a2c3d;  
-    border-radius:20px;  
-    margin-top:10px;  
-    overflow:hidden;  
-}  
-  
-.progress div{  
-    height:100%;  
-    background:#42e695;  
-    border-radius:20px;  
-}  
-  
-.pitch{  
-    position:relative;  
-    width:100%;  
-    max-width:700px;  
-    height:360px;  
-    margin:20px auto;  
-    background:#116b3d;  
-    border:3px solid white;  
-    border-radius:10px;  
-    overflow:hidden;  
-}  
-  
-.pitch:before{  
-    content:"";  
-    position:absolute;  
-    width:100px;  
-    height:100px;  
-    border:2px solid white;  
-    border-radius:50%;  
-    top:50%;  
-    left:50%;  
-    transform:translate(-50%,-50%);  
-}  
-  
-.pitch:after{  
-    content:"";  
-    position:absolute;  
-    width:2px;  
-    height:100%;  
-    background:white;  
-    left:50%;  
-    top:0;  
-}  
-  
-.player{  
-    position:absolute;  
-    width:38px;  
-    height:38px;  
-    background:#fff;  
-    color:#111;  
-    border-radius:50%;  
-    display:flex;  
-    align-items:center;  
-    justify-content:center;  
-    font-size:11px;  
-    font-weight:bold;  
-    border:3px solid #42e695;  
-}  
-  
-.p1{right:5%;top:42%}  
-.p2{right:18%;top:15%}  
-.p3{right:18%;top:69%}  
-.p4{right:31%;top:28%}  
-.p5{right:31%;top:56%}  
-.p6{right:44%;top:42%}  
-.p7{left:35%;top:12%}  
-.p8{left:35%;top:72%}  
-.p9{left:22%;top:30%}  
-.p10{left:22%;top:55%}  
-.p11{left:5%;top:42%}  
-  
-footer{  
-    text-align:center;  
-    color:#72879b;  
-    padding:30px 10px;  
-    font-size:13px;  
-}  
-  
-@media(max-width:700px){  
-    .grid,  
-    .analysis-grid{  
-        grid-template-columns:1fr;  
-    }  
-  
-    .logo{  
-        font-size:23px;  
-    }  
-  
-    .pitch{  
-        height:300px;  
-    }  
-}  
-</style>  </head>  <body>  <header>  
-    <div class="logo">⚽ Football <span>Taktik AI</span></div>  
-    <div class="subtitle">  
-        أداة ذكية لمساعدة عشاق كرة القدم على فهم التكتيك والتحليل  
-    </div>  
-</header>  <div class="container">  <!-- رفع الصورة -->  
-<div class="card">  
-
-    <h2>📸 تحليل لقطة المباراة</h2>  
-
-    <label for="imageInput" class="upload">  
-
-        <div class="upload-icon">📷</div>  
-
-        <h3>اضغط هنا لرفع صورة المباراة</h3>  
-
-        <p style="color:#8fa6ba;margin-top:8px">  
-            ارفع لقطة من المباراة وسنجهز لك التحليل التكتيكي  
-        </p>  
-
-    </label>  
-
-    <input  
-        type="file"  
-        id="imageInput"  
-        accept="image/*"  
-    >  
-
-    <img id="preview">  
-
-</div>  
-
-
-<!-- معلومات المباراة -->  
-<div class="card">  
-
-    <h2>⚙️ إعداد التحليل</h2>  
-
-    <div class="grid">  
-
-        <div>  
-            <label>الفريق</label>  
-
-            <input  
-                id="team"  
-                type="text"  
-                placeholder="مثال: برشلونة"  
-            >  
-        </div>  
-
-        <div>  
-            <label>الفريق الخصم</label>  
-
-            <input  
-                id="opponent"  
-                type="text"  
-                placeholder="مثال: ريال مدريد"  
-            >  
-        </div>  
-
-        <div>  
-            <label>الخطة</label>  
-
-            <select id="formation">  
-
-                <option>4-3-3</option>  
-                <option>4-2-3-1</option>  
-                <option>4-4-2</option>  
-                <option>3-4-3</option>  
-                <option>3-4-2-1</option>  
-                <option>3-5-2</option>  
-                <option>4-3-2-1</option>  
-
-            </select>  
-
-        </div>  
-
-        <div>  
-            <label>مرحلة اللعب</label>  
-
-            <select id="phase">  
-
-                <option>البناء من الخلف</option>  
-                <option>التقدم بالكرة</option>  
-                <option>الثلث الأخير</option>  
-                <option>الضغط</option>  
-                <option>الدفاع</option>  
-                <option>التحول الهجومي</option>  
-                <option>التحول الدفاعي</option>  
-
-            </select>  
-
-        </div>  
-
-    </div>  
-
-    <br>  
-
-    <button class="analyze" onclick="analyze()">  
-        🧠 تحليل تكتيكي  
-    </button>  
-
-</div>  
-
-
-<!-- النتيجة -->  
-<div class="card result" id="result">  
-
-    <div class="result-header">  
-
-        <h2>🧠 تقرير Football Taktik AI</h2>  
-
-        <div class="badge">  
-            تحليل مبدئي  
-        </div>  
-
-    </div>  
-
-    <div class="analysis-grid">  
-
-        <div class="analysis-box">  
-
-            <h3>🏗️ البناء من الخلف</h3>  
-
-            <p id="buildText">  
-                يقوم الفريق بمحاولة إخراج الكرة من الخط الخلفي  
-                مع استخدام لاعب الوسط كمخرج للضغط.  
-            </p>  
-
-        </div>  
-
-
-        <div class="analysis-box">  
-
-            <h3>🔥 الضغط</h3>  
-
-            <p id="pressText">  
-                عند فقدان الكرة، يحاول الفريق استرجاعها بسرعة  
-                من خلال الضغط على حامل الكرة.  
-            </p>  
-
-        </div>  
-
-
-        <div class="analysis-box">  
-
-            <h3>⚔️ الهجوم</h3>  
-
-            <p id="attackText">  
-                يتم استغلال المساحات بين الخطوط مع محاولة  
-                خلق زيادة عددية في الجهة التي توجد فيها الكرة.  
-            </p>  
-
-        </div>  
-
-
-        <div class="analysis-box">  
-
-            <h3>🛡️ الدفاع</h3>  
-
-            <p id="defenseText">  
-                يحاول الفريق المحافظة على تقارب الخطوط  
-                وتقليل المساحات أمام منطقة الجزاء.  
-            </p>  
-
-        </div>  
-
-    </div>  
-
-
-    <br>  
-
-    <div class="analysis-box">  
-
-        <h3>📊 التقييم التكتيكي</h3>  
-
-        <div class="score" id="score">  
-            82/100  
-        </div>  
-
-        <div class="progress">  
-            <div id="scoreBar" style="width:82%"></div>  
-        </div>  
-
-    </div>  
-
-
-    <br>  
-
-    <div class="analysis-box">  
-
-        <h3>📍 الشكل التكتيكي</h3>  
-
-        <div class="pitch">  
-
-            <div class="player p1">GK</div>  
-            <div class="player p2">RB</div>  
-            <div class="player p3">LB</div>  
-            <div class="player p4">CB</div>  
-            <div class="player p5">CB</div>  
-            <div class="player p6">DM</div>  
-            <div class="player p7">RW</div>  
-            <div class="player p8">LW</div>  
-            <div class="player p9">CM</div>  
-            <div class="player p10">AM</div>  
-            <div class="player p11">ST</div>  
-
-        </div>  
-
-    </div>  
-
-
-    <br>  
-
-    <div class="analysis-box">  
-
-        <h3>💡 ملاحظة المدرب</h3>  
-
-        <p id="coachAdvice">  
-            إذا كان الخصم يضغط من الأمام، يمكن للفريق جذب الضغط  
-            إلى جهة ثم تغيير اللعب بسرعة إلى الجهة العكسية.  
-        </p>  
-
-    </div>  
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Football Taktik AI</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    font-family:Arial,Tahoma,sans-serif;
+    background:#07111f;
+    color:#fff;
+    min-height:100vh;
+}
+
+header{
+    background:linear-gradient(135deg,#0b1d33,#102b4b);
+    padding:20px;
+    text-align:center;
+    border-bottom:1px solid #24425f;
+}
+
+.logo{
+    font-size:28px;
+    font-weight:bold;
+    color:#42e695;
+}
+
+.logo span{
+    color:#ffffff;
+}
+
+.subtitle{
+    margin-top:8px;
+    color:#a9bdd0;
+    font-size:14px;
+}
+
+.container{
+    width:92%;
+    max-width:1100px;
+    margin:25px auto;
+}
+
+.card{
+    background:#0d1c2d;
+    border:1px solid #203951;
+    border-radius:18px;
+    padding:20px;
+    margin-bottom:20px;
+    box-shadow:0 8px 25px rgba(0,0,0,.2);
+}
+
+.card h2{
+    margin-bottom:15px;
+    font-size:20px;
+}
+
+.upload{
+    border:2px dashed #31536f;
+    border-radius:15px;
+    padding:35px 20px;
+    text-align:center;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.upload:hover{
+    border-color:#42e695;
+    background:#10263a;
+}
+
+.upload-icon{
+    font-size:50px;
+    margin-bottom:10px;
+}
+
+#imageInput{
+    display:none;
+}
+
+#preview{
+    max-width:100%;
+    max-height:450px;
+    margin:20px auto 0;
+    display:none;
+    border-radius:12px;
+    border:1px solid #31536f;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:15px;
+}
+
+label{
+    display:block;
+    margin-bottom:7px;
+    color:#b9ccdc;
+}
+
+select,
+input{
+    width:100%;
+    padding:13px;
+    border-radius:10px;
+    border:1px solid #31536f;
+    background:#081522;
+    color:white;
+    font-size:15px;
+    outline:none;
+}
+
+select:focus,
+input:focus{
+    border-color:#42e695;
+}
+
+button{
+    width:100%;
+    border:0;
+    padding:15px;
+    border-radius:12px;
+    font-size:17px;
+    font-weight:bold;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.analyze{
+    background:linear-gradient(135deg,#42e695,#19b96b);
+    color:#06140d;
+}
+
+.analyze:hover{
+    transform:translateY(-2px);
+    filter:brightness(1.08);
+}
+
+.analyze:disabled{
+    opacity:.6;
+    cursor:wait;
+    transform:none;
+}
+
+.result{
+    display:none;
+}
+
+.result-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    margin-bottom:20px;
+}
+
+.badge{
+    background:#173f36;
+    color:#42e695;
+    padding:7px 12px;
+    border-radius:20px;
+    font-size:13px;
+}
+
+.analysis-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:15px;
+}
+
+.analysis-box{
+    background:#081522;
+    border:1px solid #213c55;
+    border-radius:14px;
+    padding:18px;
+}
+
+.analysis-box h3{
+    margin-bottom:10px;
+    color:#42e695;
+}
+
+.analysis-box p{
+    color:#c4d2df;
+    line-height:1.8;
+}
+
+.score{
+    font-size:35px;
+    font-weight:bold;
+    color:#42e695;
+}
+
+.progress{
+    width:100%;
+    height:8px;
+    background:#1a2c3d;
+    border-radius:20px;
+    margin-top:10px;
+    overflow:hidden;
+}
+
+.progress div{
+    height:100%;
+    background:#42e695;
+    border-radius:20px;
+    transition:.5s;
+}
+
+.pitch{
+    position:relative;
+    width:100%;
+    max-width:700px;
+    height:360px;
+    margin:20px auto;
+    background:#116b3d;
+    border:3px solid white;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+.pitch:before{
+    content:"";
+    position:absolute;
+    width:100px;
+    height:100px;
+    border:2px solid white;
+    border-radius:50%;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+}
+
+.pitch:after{
+    content:"";
+    position:absolute;
+    width:2px;
+    height:100%;
+    background:white;
+    left:50%;
+    top:0;
+}
+
+.player{
+    position:absolute;
+    width:38px;
+    height:38px;
+    background:#fff;
+    color:#111;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:11px;
+    font-weight:bold;
+    border:3px solid #42e695;
+}
+
+.p1{right:5%;top:42%}
+.p2{right:18%;top:15%}
+.p3{right:18%;top:69%}
+.p4{right:31%;top:28%}
+.p5{right:31%;top:56%}
+.p6{right:44%;top:42%}
+.p7{left:35%;top:12%}
+.p8{left:35%;top:72%}
+.p9{left:22%;top:30%}
+.p10{left:22%;top:55%}
+.p11{left:5%;top:42%}
+
+footer{
+    text-align:center;
+    color:#72879b;
+    padding:30px 10px;
+    font-size:13px;
+}
+
+@media(max-width:700px){
+
+    .grid,
+    .analysis-grid{
+        grid-template-columns:1fr;
+    }
+
+    .logo{
+        font-size:23px;
+    }
+
+    .pitch{
+        height:300px;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+        ⚽ Football <span>Taktik AI</span>
+    </div>
+
+    <div class="subtitle">
+        أداة ذكية لمساعدة عشاق كرة القدم على فهم التكتيك والتحليل
+    </div>
+
+</header>
+
+<div class="container">
+
+<div class="card">
+
+    <h2>📸 تحليل لقطة المباراة</h2>
+
+    <label for="imageInput" class="upload">
+
+        <div class="upload-icon">
+            📷
+        </div>
+
+        <h3>
+            اضغط هنا لرفع صورة المباراة
+        </h3>
+
+        <p style="color:#8fa6ba;margin-top:8px">
+
+            ارفع لقطة من المباراة وسنجهز لك التحليل التكتيكي
+
+        </p>
+
+    </label>
+
+    <input
+        type="file"
+        id="imageInput"
+        accept="image/*"
+    >
+
+    <img id="preview">
 
 </div>
 
-</div>  <footer>  
-    Football Taktik AI © 2026  
-    <br>  
-    أداة تعليمية لتحليل وفهم التكتيك في كرة القدم  
-</footer>  <script>  
-  
-const imageInput = document.getElementById("imageInput");  
-const preview = document.getElementById("preview");  
-  
-imageInput.addEventListener("change", function(){  
-  
-    const file = this.files[0];  
-  
-    if(!file) return;  
-  
-    const reader = new FileReader();  
-  
-    reader.onload = function(e){  
-  
-        preview.src = e.target.result;  
-        preview.style.display = "block";  
-  
-    };  
-  
-    reader.readAsDataURL(file);  
-  
-});  
-  
-  
-function analyze(){  
-  
-    const team =  
-        document.getElementById("team").value ||  
-        "الفريق";  
-  
-    const opponent =  
-        document.getElementById("opponent").value ||  
-        "الخصم";  
-  
-    const formation =  
-        document.getElementById("formation").value;  
-  
-    const phase =  
-        document.getElementById("phase").value;  
-  
-  
-    let build =  
-        team +  
-        " يستخدم خطة " +  
-        formation +  
-        ". في مرحلة " +  
-        phase +  
-        "، من المهم المحافظة على زوايا تمرير متعددة وعدم ترك حامل الكرة معزولاً.";  
-  
-    let press =  
-        "عند فقدان الكرة أمام " +  
-        opponent +  
-        "، يمكن للفريق محاولة الضغط مباشرة على حامل الكرة، مع غلق خيارات التمرير القريبة.";  
-  
-    let attack =  
-        "الهجوم يصبح أكثر خطورة عندما يتحرك اللاعبون بين الخطوط، " +  
-        "ويقوم الجناح أو الظهير باستغلال المساحة الموجودة على الطرف.";  
-  
-    let defense =  
-        "يجب المحافظة على المسافات بين خط الدفاع والوسط، " +  
-        "خصوصاً عندما يحاول الخصم اللعب خلف الظهير أو في المساحة بين قلب الدفاع والظهير.";  
-  
-    let advice =  
-        "راقب اللاعب الموجود خلف خط الضغط. إذا حصل على الكرة بدون ضغط، " +  
-        "يمكنه غالباً تمرير الكرة إلى المساحة خلف خط الوسط.";  
-  
-    document.getElementById("buildText").innerText = build;  
-    document.getElementById("pressText").innerText = press;  
-    document.getElementById("attackText").innerText = attack;  
-    document.getElementById("defenseText").innerText = defense;  
-    document.getElementById("coachAdvice").innerText = advice;  
-  
-    document.getElementById("result").style.display = "block";  
-  
-    window.scrollTo({  
-        top: document.getElementById("result").offsetTop - 20,  
-        behavior: "smooth"  
-    });  
-  
-}  
-  
-</script>  </body>  
-</html>. هذا هو الكود 
+<div class="card">
+
+    <h2>⚙️ إعداد التحليل</h2>
+
+    <div class="grid">
+
+        <div>
+
+            <label>
+                الفريق
+            </label>
+
+            <input
+                id="team"
+                type="text"
+                placeholder="مثال: برشلونة"
+            >
+
+        </div>
+
+        <div>
+
+            <label>
+                الفريق الخصم
+            </label>
+
+            <input
+                id="opponent"
+                type="text"
+                placeholder="مثال: ريال مدريد"
+            >
+
+        </div>
+
+        <div>
+
+            <label>
+                الخطة
+            </label>
+
+            <select id="formation">
+
+                <option>4-3-3</option>
+                <option>4-2-3-1</option>
+                <option>4-4-2</option>
+                <option>3-4-3</option>
+                <option>3-4-2-1</option>
+                <option>3-5-2</option>
+                <option>4-3-2-1</option>
+
+            </select>
+
+        </div>
+
+        <div>
+
+            <label>
+                مرحلة اللعب
+            </label>
+
+            <select id="phase">
+
+                <option>البناء من الخلف</option>
+                <option>التقدم بالكرة</option>
+                <option>الثلث الأخير</option>
+                <option>الضغط</option>
+                <option>الدفاع</option>
+                <option>التحول الهجومي</option>
+                <option>التحول الدفاعي</option>
+
+            </select>
+
+        </div>
+
+    </div>
+
+    <br>
+
+    <button
+        class="analyze"
+        onclick="analyze()"
+    >
+
+        🧠 تحليل تكتيكي
+
+    </button>
+
+</div>
+
+<div
+    class="card result"
+    id="result"
+>
+
+    <div class="result-header">
+
+        <h2>
+            🧠 تقرير Football Taktik AI
+        </h2>
+
+        <div class="badge">
+            تحليل بالذكاء الاصطناعي
+        </div>
+
+    </div>
+
+    <div class="analysis-grid">
+
+        <div class="analysis-box">
+
+            <h3>
+                🏗️ البناء من الخلف
+            </h3>
+
+            <p id="buildText">
+                جاري انتظار التحليل...
+            </p>
+
+        </div>
+
+        <div class="analysis-box">
+
+            <h3>
+                🔥 الضغط
+            </h3>
+
+            <p id="pressText">
+                جاري انتظار التحليل...
+            </p>
+
+        </div>
+
+        <div class="analysis-box">
+
+            <h3>
+                ⚔️ الهجوم
+            </h3>
+
+            <p id="attackText">
+                جاري انتظار التحليل...
+            </p>
+
+        </div>
+
+        <div class="analysis-box">
+
+            <h3>
+                🛡️ الدفاع
+            </h3>
+
+            <p id="defenseText">
+                جاري انتظار التحليل...
+            </p>
+
+        </div>
+
+    </div>
+
+    <br>
+
+    <div class="analysis-box">
+
+        <h3>
+            📊 التقييم التكتيكي
+        </h3>
+
+        <div
+            class="score"
+            id="score"
+        >
+            --/100
+        </div>
+
+        <div class="progress">
+
+            <div
+                id="scoreBar"
+                style="width:0%"
+            ></div>
+
+        </div>
+
+    </div>
+
+    <br>
+
+    <div class="analysis-box">
+
+        <h3>
+            📍 الشكل التكتيكي
+        </h3>
+
+        <div class="pitch">
+
+            <div class="player p1">
+                GK
+            </div>
+
+            <div class="player p2">
+                RB
+            </div>
+
+            <div class="player p3">
+                LB
+            </div>
+
+            <div class="player p4">
+                CB
+            </div>
+
+            <div class="player p5">
+                CB
+            </div>
+
+            <div class="player p6">
+                DM
+            </div>
+
+            <div class="player p7">
+                RW
+            </div>
+
+            <div class="player p8">
+                LW
+            </div>
+
+            <div class="player p9">
+                CM
+            </div>
+
+            <div class="player p10">
+                AM
+            </div>
+
+            <div class="player p11">
+                ST
+            </div>
+
+        </div>
+
+    </div>
+
+    <br>
+
+    <div class="analysis-box">
+
+        <h3>
+            💡 ملاحظة المدرب
+        </h3>
+
+        <p id="coachAdvice">
+            جاري انتظار التحليل...
+        </p>
+
+    </div>
+
+</div>
+
+</div>
+
+<footer>
+
+    Football Taktik AI © 2026
+
+    <br>
+
+    أداة تعليمية لتحليل وفهم التكتيك في كرة القدم
+
+</footer>
+
+<script>
+
+const imageInput =
+    document.getElementById("imageInput");
+
+const preview =
+    document.getElementById("preview");
+
+imageInput.addEventListener(
+    "change",
+    function(){
+
+        const file = this.files[0];
+
+        if(!file) return;
+
+        const reader =
+            new FileReader();
+
+        reader.onload =
+            function(e){
+
+                preview.src =
+                    e.target.result;
+
+                preview.style.display =
+                    "block";
+
+            };
+
+        reader.readAsDataURL(file);
+
+    }
+);
+
+async function analyze(){
+
+    const file =
+        imageInput.files[0];
+
+    if(!file){
+
+        alert(
+            "📸 أولاً ارفع صورة من المباراة"
+        );
+
+        return;
+
+    }
+
+    const team =
+        document.getElementById("team").value ||
+        "الفريق";
+
+    const opponent =
+        document.getElementById("opponent").value ||
+        "الخصم";
+
+    const formation =
+        document.getElementById("formation").value;
+
+    const phase =
+        document.getElementById("phase").value;
+
+    const button =
+        document.querySelector(".analyze");
+
+    button.disabled = true;
+
+    button.innerText =
+        "🧠 جاري تحليل الصورة...";
+
+    document.getElementById("result").style.display =
+        "block";
+
+    document.getElementById("buildText").innerText =
+        "🧠 الذكاء الاصطناعي يقوم بتحليل اللقطة...";
+
+    document.getElementById("pressText").innerText =
+        "🧠 جاري تحليل الضغط...";
+
+    document.getElementById("attackText").innerText =
+        "🧠 جاري تحليل الهجوم...";
+
+    document.getElementById("defenseText").innerText =
+        "🧠 جاري تحليل الدفاع...";
+
+    document.getElementById("coachAdvice").innerText =
+        "🧠 جاري إعداد ملاحظة المدرب...";
+
+    try{
+
+        const base64 =
+            await fileToBase64(file);
+
+        const response =
+            await fetch(
+                "/api/analyze",
+                {
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:JSON.stringify({
+
+                        image:base64,
+                        team:team,
+                        opponent:opponent,
+                        formation:formation,
+                        phase:phase
+
+                    })
+
+                }
+            );
+
+        const data =
+            await response.json();
+
+        if(!response.ok){
+
+            throw new Error(
+                data.error ||
+                "حدث خطأ أثناء التحليل"
+            );
+
+        }
+
+        document.getElementById(
+            "buildText"
+        ).innerText =
+            data.build ||
+            "لم يتم العثور على معلومات كافية.";
+
+        document.getElementById(
+            "pressText"
+        ).innerText =
+            data.press ||
+            "لم يتم العثور على معلومات كافية.";
+
+        document.getElementById(
+            "attackText"
+        ).innerText =
+            data.attack ||
+            "لم يتم العثور على معلومات كافية.";
+
+        document.getElementById(
+            "defenseText"
+        ).innerText =
+            data.defense ||
+            "لم يتم العثور على معلومات كافية.";
+
+        document.getElementById(
+            "coachAdvice"
+        ).innerText =
+            data.advice ||
+            "لا توجد ملاحظة إضافية.";
+
+        const score =
+            Math.max(
+                0,
+                Math.min(
+                    100,
+                    Number(data.score) || 0
+                )
+            );
+
+        document.getElementById(
+            "score"
+        ).innerText =
+            score + "/100";
+
+        document.getElementById(
+            "scoreBar"
+        ).style.width =
+            score + "%";
+
+        window.scrollTo({
+
+            top:
+                document.getElementById(
+                    "result"
+                ).offsetTop - 20,
+
+            behavior:"smooth"
+
+        });
+
+    }
+
+    catch(error){
+
+        console.error(error);
+
+        document.getElementById(
+            "buildText"
+        ).innerText =
+            "تعذر إجراء التحليل.";
+
+        document.getElementById(
+            "pressText"
+        ).innerText =
+            "تعذر إجراء التحليل.";
+
+        document.getElementById(
+            "attackText"
+        ).innerText =
+            "تعذر إجراء التحليل.";
+
+        document.getElementById(
+            "defenseText"
+        ).innerText =
+            "تعذر إجراء التحليل.";
+
+        document.getElementById(
+            "coachAdvice"
+        ).innerText =
+            error.message;
+
+        alert(
+            "❌ وقع خطأ:\n\n" +
+            error.message
+        );
+
+    }
+
+    finally{
+
+        button.disabled =
+            false;
+
+        button.innerText =
+            "🧠 تحليل تكتيكي";
+
+    }
+
+}
+
+function fileToBase64(file){
+
+    return new Promise(
+        (resolve,reject)=>{
+
+            const reader =
+                new FileReader();
+
+            reader.onload =
+                () =>
+                    resolve(
+                        reader.result
+                    );
+
+            reader.onerror =
+                reject;
+
+            reader.readAsDataURL(file);
+
+        }
+    );
+
+}
+
+</script>
+
+</body>
+
+</html>
